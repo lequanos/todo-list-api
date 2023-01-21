@@ -22,4 +22,13 @@ export default {
     list.save();
     return list;
   },
+  async deleteList(id) {
+    const list = await List.findOne({
+      _id: id
+    });
+
+    if (!list) throw new NotFoundError('List not found')
+
+    await List.deleteOne({ _id: id });
+  },
 }
