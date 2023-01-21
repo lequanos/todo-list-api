@@ -5,5 +5,10 @@ export default {
     const { user } = req.query;
     const result = await listService.getByUser(user);
     res.json(result);
+  },
+  async createList(req, res) {
+    const { body } = req;
+    const result = await listService.createList(body);
+    res.json(result);
   }
 };

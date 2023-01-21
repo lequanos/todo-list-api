@@ -1,10 +1,16 @@
 import express from 'express';
 import listController from '../controllers/listController.js';
-import controllerHandler from '../helpers/controllerHandler.js';
+import errorHandler from '../helpers/errorHandler.js';
+import {
+  checkUserSchema,
+  checkListSchema
+} from '../middlewares/validationMiddlewares.js';
+import Joi from 'joi';
 
 const router = express.Router();
 
-router.get('/lists', controllerHandler(listController.getByUser));
+router.get('/lists', errorHandler(checkUserSchema), errorHandler(listController.getByUser));
+router.post('/list', errorHandler(checkListSchema), errorHandler(listController.createList));
 
 router.use((err, _, res, __) => {
   let {
@@ -14,6 +20,10 @@ router.use((err, _, res, __) => {
 
   if (!statusCode || Number.isNaN(Number(statusCode))) {
     statusCode = 500;
+  }
+
+  if (Joi.isError(err)) {
+    statusCode = 400;
   }
 
   res.status(statusCode).json({
