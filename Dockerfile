@@ -36,7 +36,7 @@ COPY . .
 
 ENV NODE_ENV production
 
-RUN npm ci
+RUN npm i
 
 RUN touch .env
 
