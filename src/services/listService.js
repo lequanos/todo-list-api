@@ -1,4 +1,9 @@
-import { List } from '../models/list.js';
+import {
+  List
+} from '../models/list.js';
+import {
+  Task
+} from '../models/task.js';
 import { NotFoundError, ConflictError } from '../errors/errors.js';
 
 export default {
@@ -30,9 +35,29 @@ export default {
     });
 
     if (!list) throw new NotFoundError('List not found')
-    
+
     if (list.user !== user) throw new ConflictError('List belongs to another user')
 
     await List.deleteOne({ _id: id });
   },
+  async addTask(payload, user) {
+    const list = await List.findOne({
+      _id: payload.listId
+    });
+
+    if (!list) throw new NotFoundError('List not found')
+
+    if (list.user !== user) throw new ConflictError('List belongs to another user')
+
+    const taskToAdd = new Task(payload);
+    taskToAdd.status = 'active';
+
+    list.tasks = [
+      ...list.tasks,
+      taskToAdd,
+    ];
+
+    list.save();
+    return list;
+  }
 }

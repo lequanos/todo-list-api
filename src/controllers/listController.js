@@ -23,5 +23,11 @@ export default {
     const user = req.headers['x-user'];
     await listService.deleteList(id, user);
     res.status(204).json();
-  }
+  },
+  async addTask(req, res) {
+    const { body } = req;
+    const user = req.headers['x-user'];
+    const result = await listService.addTask(body, user);
+    res.json(result);
+  },
 };
