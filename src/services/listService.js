@@ -1,11 +1,8 @@
 import schedule from 'node-schedule';
 
-import {
-  List
-} from '../models/list.js';
-import {
-  Task
-} from '../models/task.js';
+import { List } from '../models/list.js';
+import { Task } from '../models/task.js';
+import mailService from './mailService.js';
 import { NotFoundError, ConflictError } from '../errors/errors.js';
 
 export default {
@@ -57,11 +54,7 @@ export default {
     list.tasks.push(taskToAdd);
     list.save();
 
-    const date = new Date(payload.endDate);
-    schedule.scheduleJob(date, () => {
-      list.status = 'late';
-      list.save();
-    });
+    this.scheduleAlert(payload.endDate, list._id, taskToAdd._id, user);
     return list;
   },
   async updateTask(payload, user) {
@@ -78,10 +71,7 @@ export default {
     if (!task) throw new NotFoundError('Task not found')
 
     if (new Date(task.endDate).getTime() !== new Date(payload.endDate).getTime()) {
-      const date = new Date(payload.endDate);
-      schedule.scheduleJob(date, () => {
-        console.log('EN RETARDDDDDDD');
-      });
+      this.scheduleAlert(payload.endDate, list._id, task._id, user);
     }
 
     task.title = payload.title;
@@ -91,5 +81,41 @@ export default {
     list.save();
 
     return list;
-  }
+  },
+  async deleteTask(taskId, listId, user) {
+    const list = await List.findOne({
+      _id: listId
+    });
+
+    if (!list) throw new NotFoundError('List not found')
+
+    if (list.user !== user) throw new ConflictError('Task belongs to another user')
+
+    const task = list.tasks.id(taskId);
+
+    if (!task) throw new NotFoundError('Task not found')
+
+    list.tasks.id(taskId).remove();
+    list.save();
+  },
+  scheduleAlert(endDate, listId, taskId, user) {
+    const date = new Date(endDate);
+    schedule.scheduleJob(date, async () => {
+      const list = await List.findOne({
+        _id: listId
+      });
+      const task = list.tasks.id(taskId);
+
+      if (task.status === 'active') {
+        await this.updateTask({
+          id: task._id,
+          title: task.title,
+          status: 'late',
+          endDate: task.endDate,
+          listId: list._id,
+        }, user);
+        await mailService.sendEmail(user, task.title);
+      }
+    });
+  },
 }

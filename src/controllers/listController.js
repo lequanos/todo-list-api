@@ -38,4 +38,13 @@ export default {
     const result = await listService.updateTask(body, user);
     res.json(result);
   },
+  async deleteTask(req, res) {
+    const {
+      taskId,
+      listId
+    } = req.params;
+    const user = req.headers['x-user'];
+    await listService.deleteTask(taskId, listId, user);
+    res.status(204).json();
+  },
 };

@@ -7,6 +7,7 @@ import {
   checkUserSchema,
   checkSchema,
   checkIdSchema,
+  checkMultipleIdSchema,
 } from '../middlewares/validationMiddlewares.js';
 import {
   createListSchema,
@@ -23,6 +24,7 @@ router.put('/list', errorHandler(checkSchema(updateListSchema)), errorHandler(li
 router.delete('/list/:id', errorHandler(checkIdSchema), errorHandler(listController.deleteList));
 router.patch('/add/task', errorHandler(checkSchema(createTaskSchema)), errorHandler(listController.addTask));
 router.patch('/update/task', errorHandler(checkSchema(updateTaskSchema)), errorHandler(listController.updateTask));
+router.delete('/delete/task/:taskId/:listId', errorHandler(checkMultipleIdSchema), errorHandler(listController.deleteTask));
 
 router.use((err, _, res, __) => {
   let {
