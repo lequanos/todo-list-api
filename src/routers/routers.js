@@ -11,7 +11,8 @@ import {
 import {
   createListSchema,
   updateListSchema,
-  createTaskSchema
+  createTaskSchema,
+  updateTaskSchema,
 } from '../validation/schema.js';
 
 const router = express.Router();
@@ -20,7 +21,8 @@ router.get('/lists', errorHandler(checkUserSchema), errorHandler(listController.
 router.post('/list', errorHandler(checkSchema(createListSchema)), errorHandler(listController.createList));
 router.put('/list', errorHandler(checkSchema(updateListSchema)), errorHandler(listController.updateList));
 router.delete('/list/:id', errorHandler(checkIdSchema), errorHandler(listController.deleteList));
-router.put('/add-task', errorHandler(checkSchema(createTaskSchema)), errorHandler(listController.addTask));
+router.patch('/add/task', errorHandler(checkSchema(createTaskSchema)), errorHandler(listController.addTask));
+router.patch('/update/task', errorHandler(checkSchema(updateTaskSchema)), errorHandler(listController.updateTask));
 
 router.use((err, _, res, __) => {
   let {

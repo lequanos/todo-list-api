@@ -12,10 +12,6 @@ export const taskSchema = new Schema({
     type: String,
     required: true,
   },
-  createdDate: {
-    type: Date,
-    default: Date.now()
-  },
   endDate: {
     type: Date,
     required: true,

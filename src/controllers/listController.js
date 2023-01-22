@@ -30,4 +30,12 @@ export default {
     const result = await listService.addTask(body, user);
     res.json(result);
   },
+  async updateTask(req, res) {
+    const {
+      body
+    } = req;
+    const user = req.headers['x-user'];
+    const result = await listService.updateTask(body, user);
+    res.json(result);
+  },
 };
