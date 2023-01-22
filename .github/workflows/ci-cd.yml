@@ -33,7 +33,7 @@ jobs:
         run: doctl registry login --expiry-seconds 600
           
       - name: Build app
-        run: docker build -t registry.digitalocean.com/apo-registry/todo-list-api:latest . --target build --build-arg MAILJET_API_KEY=${{ secrets.MAILJET_API_KEY }} --build-arg MAILJET_SECRET_KEY=${{ secrets.MAILJET_SECRET_KEY }} --build-arg MONGO_INITDB_DATABASE=${{ secrets.MONGO_INITDB_DATABASE }} --build-arg MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} --build-arg MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+        run: docker build -t registry.digitalocean.com/apo-registry/todo-list-api:latest . --target build --build-arg MAILJET_API_KEY=${{ secrets.MAILJET_API_KEY }} --build-arg MAILJET_SECRET_KEY=${{ secrets.MAILJET_SECRET_KEY }} --build-arg MONGO_INITDB_DATABASE=${{ secrets.MONGO_INITDB_DATABASE }} --build-arg MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} --build-arg MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} --build-arg ME_CONFIG_MONGODB_URL=${{ secrets.ME_CONFIG_MONGODB_URL }}
         
       - name: Push to registry
         if: success()

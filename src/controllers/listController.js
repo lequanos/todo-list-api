@@ -2,23 +2,26 @@ import listService from '../services/listService.js';
 
 export default {
   async getByUser(req, res) {
-    const { user } = req.query;
+    const user = req.headers['x-user'];
     const result = await listService.getByUser(user);
     res.json(result);
   },
   async createList(req, res) {
     const { body } = req;
-    const result = await listService.createList(body);
+    const user = req.headers['x-user'];
+    const result = await listService.createList(body, user);
     res.status(201).json(result);
   },
   async updateList(req, res) {
     const { body } = req;
-    const result = await listService.updateList(body);
+    const user = req.headers['x-user'];
+    const result = await listService.updateList(body, user);
     res.json(result);
   },
   async deleteList(req, res) {
     const { id } = req.params;
-    await listService.deleteList(id);
+    const user = req.headers['x-user'];
+    await listService.deleteList(id, user);
     res.status(204).json();
   }
 };

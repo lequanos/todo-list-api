@@ -10,10 +10,6 @@ export const createListSchema = Joi.object({
     'any.required': 'List title is required'
   }),
   tasks: Joi.array(),
-  user: Joi.string().email().required().messages({
-    'string.email': 'Please provide a valid format email',
-    'any.required': 'User email is required'
-  }),
 });
 
 export const updateListSchema = createListSchema.keys({
@@ -27,3 +23,13 @@ export const idSchema = Joi.string().regex(/^[0-9a-f-F]{24}$/).required().messag
   'string.pattern.base': 'Please provide a valid format id',
   'any.required': 'Please provide an id'
 })
+
+export const createTaskSchema = Joi.object({
+  title: Joi.string().required().messages({
+    'any.required': 'Task title is required'
+  }),
+  user: Joi.string().email().required().messages({
+    'string.email': 'Please provide a valid format email',
+    'any.required': 'User email is required'
+  }),
+});

@@ -9,3 +9,10 @@ services:
       - .:/usr/src/app
     depends_on:
      - mongo
+    networks:
+     - app-network
+  
+networks:
+  app-network:
+    driver: bridge
+    external: true

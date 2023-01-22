@@ -6,7 +6,7 @@ import connect from './db/index.js';
 const app = express();
 
 app.use(json());
-app.use('/stoque', router);
+app.use(router);
 
 app.listen(process.env.PORT || 3000, async () => {
     await connect();
