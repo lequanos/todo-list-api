@@ -1,0 +1,12 @@
+services:
+  todo-list-api:
+    image: registry.digitalocean.com/apo-registry/todo-list-api:latest
+    container_name: todo-list-api
+    command: sh -c "npm start"
+    container_name: todo-list-api
+    ports:
+     - '4000:3000'
+    volumes: 
+      - .:/usr/src/app
+    depends_on:
+     - mongo

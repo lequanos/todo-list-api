@@ -1,0 +1,73 @@
+
+name: Build and deploy Todo list API on Digital Ocean Droplet
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install doctl
+        if: success()
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITAL_OCEAN_API_ACCESS_TOKEN }}
+
+      - name: Login to Digital Ocean registry
+        run: doctl registry login --expiry-seconds 600
+          
+      - name: Build app
+        run: docker build -t registry.digitalocean.com/apo-registry/todo-list-api:latest . --target build --build-arg MAILJET_API_KEY=${{ secrets.MAILJET_API_KEY }} --build-arg MAILJET_SECRET_KEY=${{ secrets.MAILJET_SECRET_KEY }} --build-arg MONGO_INITDB_DATABASE=${{ secrets.MONGO_INITDB_DATABASE }} --build-arg MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} --build-arg MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+        
+      - name: Push to registry
+        if: success()
+        run: docker push registry.digitalocean.com/apo-registry/todo-list-api:latest
+      
+      - name: Delete untagged images
+        if: success()
+        run: doctl registry garbage-collection start  --force --include-untagged-manifests apo-registry
+  
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Connect to Digital Ocean Droplet and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DIGITAL_OCEAN_HOST }}
+          username: ${{ secrets.SSH_DIGITAL_OCEAN_DROPLET_USER }}
+          password: ${{ secrets.SSH_DIGITAL_OCEAN_DROPLET_PASSWORD }}
+          script_stop: true
+          script: |
+            cd todo-list-api
+            git fetch --all
+            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- Dockerfile
+            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- docker-compose.yaml
+            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- docker-compose.prod.yaml
+            docker-compose down --remove-orphans 
+            docker system prune -a -f
+            docker pull registry.digitalocean.com/apo-registry/todo-list-api:latest
+            docker-compose --env-file .env -f docker-compose.yaml -f docker-compose.prod.yaml up -d
