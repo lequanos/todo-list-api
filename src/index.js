@@ -5,11 +5,10 @@ import connect from './db/index.js';
 
 const app = express();
 
-await connect();
-
 app.use(json());
-app.use(router);
+app.use('/stoque', router);
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3000, async () => {
+    await connect();
     console.log('Server running on :', process.env.PORT);
 });
