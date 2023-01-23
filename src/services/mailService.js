@@ -1,40 +1,52 @@
-import Mailjet from 'node-mailjet';
+import nodemailer from 'nodemailer';
 
 export default {
-  async sendEmail(user, title) {
-    const mailjet = Mailjet.apiConnect(
-      process.env.MAILJET_API_KEY,
-      process.env.MAILJET_SECRET_KEY,
-    );
-    console.log(user, title)
-    const request = mailjet
-      .post('send', { version: 'v3.1'})
-      .request({
-        Messages: [
-          {
-            From: {
-              Email: 'quan@buri.fr',
-              Name: 'Todo',
-            },
-            To: [
-              {
-                Email: user,
-                Name: user,
-              }
-            ],
-            Subject: 'Tâche en retard',
-            TextPart: `Vous avez une tâche en retard`,
-            HTMLPart: `<h3>Tâche ${title}</h3><br />Vous feriez mieux de vous dépêcher!`
-          }
-        ]
+  async sendAlertEmail(user, title) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'in-v3.mailjet.com',
+        secure: false,
+        port: 587,
+        ignoreTLS: true,
+        auth: {
+          user: process.env.MAILJET_API_KEY,
+          pass: process.env.MAILJET_SECRET_KEY,
+        },
       });
-    
-    request
-      .then((result) => {
-        console.log(result.body)
-      })
-      .catch((err) => {
-        console.log(err.statusCode)
-      })
+
+      await transporter.sendMail({
+        from: '"quan@buri.fr" <quan@buri.fr>',
+        to: user,
+        subject: `Tâche en retard`,
+        text: 'Vous avez une tâche en retard!',
+        html: `<b>Tâche intitulé ${title}</b>`,
+      });
+    } catch (error) {
+      console.log(error)
+    }
   },
+  async sendCompleteEmail(user, title) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'in-v3.mailjet.com',
+        secure: false,
+        port: 587,
+        ignoreTLS: true,
+        auth: {
+          user: process.env.MAILJET_API_KEY,
+          pass: process.env.MAILJET_SECRET_KEY,
+        },
+      });
+
+      await transporter.sendMail({
+        from: '"quan@buri.fr" <quan@buri.fr>',
+        to: user,
+        subject: 'Tâches complétées',
+        text: 'Vous avez complété toutes vos tâches !',
+        html: `<b>Vous avez complété toutes vos tâches de la liste ${title}</b>`,
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }

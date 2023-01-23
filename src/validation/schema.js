@@ -64,5 +64,6 @@ export const updateTaskSchema = createTaskSchema.keys({
   status: Joi.string().valid('active', 'inactive').required().messages({
     'string.valid': 'Please provide a valid value for status',
     'any.required': 'Status is required',
-  })
+  }),
+  endDate: Joi.date(),
 });

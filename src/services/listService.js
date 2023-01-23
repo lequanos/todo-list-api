@@ -80,6 +80,10 @@ export default {
 
     list.save();
 
+    if (list.tasks.every((task) => task.status === 'inactive')) {
+      await mailService.sendCompleteEmail(user, list.title);
+    }
+
     return list;
   },
   async deleteTask(taskId, listId, user) {
@@ -114,7 +118,7 @@ export default {
           endDate: task.endDate,
           listId: list._id,
         }, user);
-        await mailService.sendEmail(user, task.title);
+        await mailService.sendAlertEmail(user, task.title);
       }
     });
   },
