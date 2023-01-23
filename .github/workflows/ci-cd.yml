@@ -49,11 +49,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
       - name: Connect to Digital Ocean Droplet and deploy
         uses: appleboy/ssh-action@master
         with:
@@ -63,10 +58,7 @@ jobs:
           script_stop: true
           script: |
             cd todo-list-api
-            git fetch --all
-            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- Dockerfile
-            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- docker-compose.yaml
-            git checkout origin/${{ steps.extract_branch.outputs.branch }} -- docker-compose.prod.yaml
+            git pull
             docker-compose down --remove-orphans 
             docker system prune -a -f
             docker pull registry.digitalocean.com/apo-registry/todo-list-api:latest
