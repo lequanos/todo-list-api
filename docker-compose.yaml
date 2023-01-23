@@ -6,6 +6,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    networks:
+     - app-network
+    ports:
+     - '27017:27017'
+    volumes:
+      - mongodata:/data/db
+ 
+volumes:
+  mongodata:
 
 networks:
   app-network:
