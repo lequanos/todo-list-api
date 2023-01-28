@@ -75,8 +75,8 @@ export default {
     }
 
     task.title = payload.title;
+    task.status = new Date(task.endDate).getTime() === new Date(payload.endDate).getTime() ? payload.status : 'active';
     task.endDate = payload.endDate;
-    task.status = payload.status;
 
     list.save();
 
