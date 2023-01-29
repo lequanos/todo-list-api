@@ -15,7 +15,7 @@ export default {
       });
 
       await transporter.sendMail({
-        from: '"quan@buri.fr" <quan@buri.fr>',
+        from: `"${process.env.EMAIL_SENDER}" <${process.env.EMAIL_SENDER}>`,
         to: user,
         subject: `Tâche en retard`,
         text: 'Vous avez une tâche en retard!',
@@ -39,7 +39,7 @@ export default {
       });
 
       await transporter.sendMail({
-        from: '"quan@buri.fr" <quan@buri.fr>',
+        from: `"${process.env.EMAIL_SENDER}" <${process.env.EMAIL_SENDER}>`,
         to: user,
         subject: 'Tâches complétées',
         text: 'Vous avez complété toutes vos tâches !',
